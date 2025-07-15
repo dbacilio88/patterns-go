@@ -29,14 +29,15 @@ import (
  */
 
 type Rabbitmq struct {
-	conn    *amqp.Connection
-	channel *amqp.Channel
-	mutex   *sync.Mutex
-	queue   string
-	handler func([]byte)
+	conn       *amqp.Connection
+	channel    *amqp.Channel
+	mutex      *sync.Mutex
+	queue      string
+	handler    func([]byte)
+	IsExchange bool
 }
 
-type ParamRabbitmq struct {
+type RabbitParam struct {
 	Url       string //"amqp://guest:guest@localhost:5672/"
 	QueueName string
 	Vhost     string
@@ -54,7 +55,7 @@ func GetInstance() *Rabbitmq {
 	return instance
 }
 
-func (p *Rabbitmq) Connect(param ParamRabbitmq) error {
+func (p *Rabbitmq) Connect(param RabbitParam) error {
 	var err error
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
@@ -95,7 +96,7 @@ func (p *Rabbitmq) Connect(param ParamRabbitmq) error {
 	return nil
 }
 
-func (p *Rabbitmq) handleReconnection(param ParamRabbitmq) {
+func (p *Rabbitmq) handleReconnection(param RabbitParam) {
 	chanErr := p.conn.NotifyClose(make(chan *amqp.Error))
 	if chanErr != nil {
 		for {
@@ -108,7 +109,7 @@ func (p *Rabbitmq) handleReconnection(param ParamRabbitmq) {
 	}
 }
 
-func (p *Rabbitmq) ConnectionWithHandler(param ParamRabbitmq) error {
+func (p *Rabbitmq) ConnectionWithHandler(param RabbitParam) error {
 	var err error
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
@@ -127,7 +128,7 @@ func (p *Rabbitmq) ConnectionWithHandler(param ParamRabbitmq) error {
 	return nil
 }
 
-func (p *Rabbitmq) handlerReconnectionWithHandler(param ParamRabbitmq) {
+func (p *Rabbitmq) handlerReconnectionWithHandler(param RabbitParam) {
 	chanErr := p.conn.NotifyClose(make(chan *amqp.Error))
 	if chanErr != nil {
 		for {

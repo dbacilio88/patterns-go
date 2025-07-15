@@ -1,6 +1,11 @@
 package app
 
-import "github.com/gorilla/mux"
+import (
+	"fmt"
+	"github.com/dbacilio88/patterns-go/internal/config/app"
+	"github.com/gorilla/mux"
+	"log"
+)
 
 /**
  * startup
@@ -22,7 +27,21 @@ import "github.com/gorilla/mux"
  * @since 6/29/2025
  */
 
-func Startup() {}
+func Startup(configPath string) {
+	log.Println("Startup")
+	var err error
+	app.Once.Do(func() {
+		if err = ConfigureApplication(configPath); err != nil {
+			message = fmt.Sprintf("Configuration Error: %s", err.Error())
+			return
+		}
+
+		if err = ExecuteRabbitProcess(); err != nil {
+			message = fmt.Sprintf("Rabbit Process Error: %s", err.Error())
+			return
+		}
+	})
+}
 
 func setupHTTPServer(router *mux.Router) {
 	router.Use()

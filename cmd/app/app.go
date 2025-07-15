@@ -31,9 +31,14 @@ var configPath string
 func Run() {
 	start := time.Now()
 	flag.StringVar(&configPath, "path", "../config", "config file path")
+	fmt.Println("Hello World", configPath)
 	flag.Parse()
+
+	Startup(configPath)
 
 	elapsed := time.Since(start)
 	fmt.Println("Start Time: ", elapsed)
-	select {}
+	select {
+	case <-time.After(30 * time.Second):
+	}
 }
